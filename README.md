@@ -2,11 +2,12 @@
 
 > A modern, cyberpunk-inspired web application and notification system that aggregates 100% free games, giveaways, and loot across **Epic Games Store**, **Steam**, **GOG**, and more.
 
-![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![Flask](https://img.shields.io/badge/Flask-2.x-000000?style=for-the-badge&logo=flask&logoColor=white)
+![Live Demo](https://img.shields.io/badge/Live_Demo-GitHub_Pages-brightgreen?style=for-the-badge&logo=github)
 ![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 ![CSS3](https://img.shields.io/badge/CSS3-Modern_Design-1572B6?style=for-the-badge&logo=css3&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+
+🔗 **Live Website**: [https://prathaya96k.github.io/Free-Game-Notifier/](https://prathaya96k.github.io/Free-Game-Notifier/)
 
 ---
 
