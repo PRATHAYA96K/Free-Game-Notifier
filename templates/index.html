@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gamehunt — discover and claim free games on Steam & Epic Games Store.">
+    <title>Gamehunt</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <!-- Ambient Canvas -->
+    <canvas id="particleCanvas"></canvas>
+    <div class="noise-overlay"></div>
+
+    <!-- ═══ Sidebar ═══ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sb-logo">
+            <div class="logo-diamond">
+                <svg viewBox="0 0 32 32" fill="none"><path d="M16 2L30 16L16 30L2 16L16 2Z" stroke="url(#logoGrad)" stroke-width="2"/><path d="M16 8L24 16L16 24L8 16L16 8Z" fill="url(#logoGrad)" opacity="0.3"/><defs><linearGradient id="logoGrad" x1="2" y1="2" x2="30" y2="30"><stop stop-color="#6C5CE7"/><stop offset="1" stop-color="#00CEFF"/></linearGradient></defs></svg>
+            </div>
+            <div class="logo-text">
+                <span class="logo-name">GH</span>
+                <span class="logo-tag">GAMEHUNT</span>
+            </div>
+        </div>
+
+        <nav class="sb-nav">
+            <button class="sb-link active" data-page="games" id="navGames">
+                <div class="sb-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4m-2-2v4"/><circle cx="15" cy="11" r="1"/><circle cx="18" cy="14" r="1"/></svg>
+                </div>
+                <span>Games</span>
+                <div class="sb-indicator"></div>
+            </button>
+            <button class="sb-link" data-page="news" id="navNews">
+                <div class="sb-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8m8-4h-8m5 8h-5"/></svg>
+                </div>
+                <span>News</span>
+                <div class="sb-indicator"></div>
+            </button>
+        </nav>
+
+        <div class="sb-bottom">
+            <div class="sb-countdown" id="scanCountdownWrap">
+                <div class="sb-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <div class="countdown-text">
+                    <span class="countdown-label">Next Auto-Scan</span>
+                    <span class="countdown-time" id="scanCountdown">10:00</span>
+                </div>
+            </div>
+            <div class="notify-toggle-wrap">
+                <div class="notify-info">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="18" height="18"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                    <span>Alerts</span>
+                </div>
+                <label class="toggle">
+                    <input type="checkbox" id="notifyToggle">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ═══ Main ═══ -->
+    <main class="main" id="main">
+
+        <!-- ▸▸▸ Games Page ▸▸▸ -->
+        <section class="page active" id="pageGames">
+
+            <!-- Hero -->
+            <div class="hero">
+                <div class="hero-content">
+                    <h1 class="hero-title">Discover <span class="gradient-text">Free Games</span></h1>
+                    <p class="hero-sub">Real-time tracking of every free game, DLC, and in-game loot across Steam and Epic Games Store, plus permanently Free-to-Play titles.</p>
+                </div>
+                <div class="hero-right">
+                    <div class="search-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+                        <input type="text" id="searchInput" placeholder="Search games by title...">
+                    </div>
+                    <div class="hero-stats">
+                        <div class="stat-pill">
+                            <span class="stat-num" id="gameCount">--</span>
+                            <span class="stat-lbl">Available</span>
+                        </div>
+                        <div class="stat-pill">
+                            <span class="stat-num" id="lastUpdate">--:--</span>
+                            <span class="stat-lbl">Last Scan</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                        <!-- Filters -->
+            <div class="filter-strip">
+                
+                <div class="filter-dropdown">
+                    <div class="dropdown-toggle">
+                        <span class="filter-title">SORT</span>
+                        <span class="dropdown-val" id="sortVal">Trending</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                    </div>
+                    <div class="dropdown-menu filter-section" id="sortFilter">
+                        <div class="pill-slider"></div>
+                        <button class="pill active" data-value="trending">Trending (Default)</button>
+                        <button class="pill" data-value="top">Top Rated</button>
+                        <button class="pill" data-value="views">Most Viewed</button>
+                        <button class="pill" data-value="recent">Newest Arrivals</button>
+                    </div>
+                </div>
+
+                <div class="filter-dropdown">
+                    <div class="dropdown-toggle">
+                        <span class="filter-title">PLATFORM</span>
+                        <span class="dropdown-val" id="platformVal">All Stores</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                    </div>
+                    <div class="dropdown-menu filter-section" id="platformFilter">
+                        <div class="pill-slider"></div>
+                        <button class="pill active" data-value="all">All Stores</button>
+                        <button class="pill" data-value="pc">PC / Web</button>
+                        <button class="pill" data-value="steam">Steam</button>
+                        <button class="pill" data-value="epic">Epic</button>
+                    </div>
+                </div>
+                
+                <div class="filter-dropdown">
+                    <div class="dropdown-toggle">
+                        <span class="filter-title">TYPE</span>
+                        <span class="dropdown-val" id="categoryVal">All Deals</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                    </div>
+                    <div class="dropdown-menu filter-section" id="categoryFilter">
+                        <div class="pill-slider"></div>
+                        <button class="pill active" data-value="all">All Deals</button>
+                        <button class="pill" data-value="game">Games</button>
+                        <button class="pill" data-value="loot">Loot</button>
+                        <button class="pill" data-value="f2p">Free-to-Play</button>
+                    </div>
+                </div>
+                
+                <div class="filter-dropdown">
+                    <div class="dropdown-toggle">
+                        <span class="filter-title">GENRE</span>
+                        <span class="dropdown-val" id="genreVal">All</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                    </div>
+                    <div class="dropdown-menu filter-section" id="genreFilter">
+                        <div class="pill-slider"></div>
+                        <button class="pill active" data-value="all">All</button>
+                        <button class="pill" data-value="action">Action</button>
+                        <button class="pill" data-value="rpg">RPG</button>
+                        <button class="pill" data-value="strategy">Strategy</button>
+                        <button class="pill" data-value="horror">Horror</button>
+                        <button class="pill" data-value="puzzle">Puzzle</button>
+                        <button class="pill" data-value="simulation">Simulation</button>
+                        <button class="pill" data-value="racing">Racing</button>
+                        <button class="pill" data-value="mmo">MMO</button>
+                        <button class="pill" data-value="sports">Sports</button>
+                        <button class="pill" data-value="3d">3D</button>
+                        <button class="pill" data-value="2d">2D</button>
+                        <button class="pill" data-value="1d">1D</button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Loader -->
+            <div class="loader-wrap" id="gamesLoader">
+                <div class="orbit-loader"><div></div><div></div><div></div></div>
+                <p class="loader-msg">Scanning stores<span class="dot-pulse"></span></p>
+            </div>
+
+            <!-- Empty -->
+            <div class="empty-state" id="emptyState" style="display:none;">
+                <div class="empty-icon">🔍</div>
+                <h3>No matches found</h3>
+                <p>Try different filters — more games appear daily.</p>
+            </div>
+
+            <!-- Grid -->
+            <div class="card-grid" id="gamesContainer" style="display:none;"></div>
+        </section>
+
+        <!-- ▸▸▸ News Page ▸▸▸ -->
+        <section class="page" id="pageNews">
+            <div class="hero">
+                <div class="hero-content">
+                    <h1 class="hero-title">Gaming <span class="gradient-text">News Feed</span></h1>
+                    <p class="hero-sub">Latest headlines from PC Gamer, Kotaku, and GameSpot — refreshed in real time.</p>
+                </div>
+            </div>
+
+            <div class="loader-wrap" id="newsLoader">
+                <div class="orbit-loader"><div></div><div></div><div></div></div>
+                <p class="loader-msg">Fetching feeds<span class="dot-pulse"></span></p>
+            </div>
+
+            <div class="news-list" id="newsContainer" style="display:none;"></div>
+        </section>
+    </main>
+
+    <!-- ═══ Modal ═══ -->
+    <div class="modal-overlay" id="gameModal">
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+            <div class="modal-loader" id="modalLoader">
+                <div class="orbit-loader"><div></div><div></div><div></div></div>
+            </div>
+            <div class="modal-body" id="modalBody" style="display:none;">
+                <div class="modal-gallery">
+                    <img class="modal-main-img" id="modalMainImg" src="" alt="">
+                    <div class="modal-thumbnails" id="modalThumbnails"></div>
+                </div>
+                <div class="modal-info">
+                    <h2 class="modal-title" id="modalTitle"></h2>
+                    <p class="modal-desc" id="modalDesc"></p>
+                    <div class="modal-sysreq" id="modalSysreq" style="display:none;">
+                        <h4>System Requirements</h4>
+                        <div class="sysreq-grid" id="modalSysreqGrid"></div>
+                    </div>
+                    <div class="modal-instructions" id="modalInstructions" style="display:none;">
+                        <h4>How to Claim</h4>
+                        <p id="modalInstructionsText"></p>
+                    </div>
+                    <a href="#" target="_blank" rel="noopener" class="btn-claim modal-claim-btn" id="modalClaimBtn">
+                        <span>Get Offer</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ Templates ═══ -->
+    <template id="gameCardTpl">
+        <article class="gcard">
+            <div class="gcard-visual">
+                <img class="gcard-img" src="" alt="" loading="lazy">
+                <div class="gcard-fade"></div>
+                <div class="gcard-badges">
+                    <span class="badge b-platform"></span>
+                    <span class="badge b-type"></span>
+                </div>
+                <div class="gcard-genre-tags"></div>
+            </div>
+            <div class="gcard-info">
+                <h3 class="gcard-title"></h3>
+                <div class="gcard-row">
+                    <span class="gcard-worth"></span>
+                    <span class="gcard-timer"></span>
+                </div>
+                <button class="btn-claim btn-details" data-source="" data-id="">
+                    <span>View Details</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                </button>
+            </div>
+        </article>
+    </template>
+
+    <template id="newsCardTpl">
+        <article class="ncard">
+            <div class="ncard-img-wrap">
+                <img class="ncard-img" src="" alt="" loading="lazy">
+                <span class="ncard-source"></span>
+            </div>
+            <div class="ncard-body">
+                <h3 class="ncard-title"></h3>
+                <p class="ncard-desc"></p>
+                <div class="ncard-foot">
+                    <span class="ncard-date"></span>
+                    <a href="#" target="_blank" rel="noopener" class="ncard-read">Read Article →</a>
+                </div>
+            </div>
+        </article>
+    </template>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
